@@ -1,6 +1,6 @@
 page 50101 "Product Sales Chart"
 {
-    Caption = 'Solgte produkter (Webshop)';
+    Caption = 'Webshop Salg pr. Produkt';
     PageType = CardPart;
     ApplicationArea = All;
 
@@ -14,16 +14,15 @@ page 50101 "Product Sales Chart"
 
                 trigger DataPointClicked(Point: JsonObject)
                 var
-                    ItemNo: Text;
+                    ItemNoToken: JsonToken;
                     Item: Record Item;
                     ItemCard: Page "Item Card";
                 begin
-                    // Når bruger klikker på en søjle, åbn Item Card
-                    Point.Get('XValueString', ItemNo);  // eller brug index afhængigt af opsætning
-                    if Item.Get(ItemNo) then begin
-                        ItemCard.SetRecord(Item);
-                        ItemCard.Run();
-                    end;
+                    if Point.Get('XValueString', ItemNoToken) then
+                        if Item.Get(ItemNoToken.AsValue().AsText()) then begin
+                            ItemCard.SetRecord(Item);
+                            ItemCard.Run();
+                        end;
                 end;
 
                 trigger AddInReady()
@@ -38,14 +37,13 @@ page 50101 "Product Sales Chart"
     var
         SalesLine: Record "Sales Line";
         Item: Record Item;
-        BusinessChartBuffer: Record "Business Chart Buffer";
         BusChartBuf: Record "Business Chart Buffer";
-        QtyIndex: Integer;
     begin
-        BusinessChartBuffer.Initialize();
-        BusinessChartBuffer.AddMeasure('Solgt antal', 1,
-            BusinessChartBuffer."Data Type"::Decimal,
-            BusinessChartBuffer."Chart Type"::Column);
+        BusChartBuf.Initialize();
+        BusChartBuf.AddMeasure(
+            'Solgt antal', 1,
+            BusChartBuf."Data Type"::Decimal,
+            BusChartBuf."Chart Type"::Column);
 
         Item.SetFilter("Sales Channel", '<>%1', Item."Sales Channel"::" ");
         if Item.FindSet() then
@@ -54,12 +52,10 @@ page 50101 "Product Sales Chart"
                 SalesLine.SetRange("No.", Item."No.");
                 SalesLine.CalcSums(Quantity);
 
-                BusinessChartBuffer.AddColumn(Item."No." + ' ' + Item.Description);
-                BusinessChartBuffer.SetValue('Solgt antal',
-                    BusinessChartBuffer.Column - 1,
-                    SalesLine.Quantity);
+                BusChartBuf.AddColumn(Item."No.");
+                BusChartBuf.SetValue('Solgt antal', BusChartBuf.Column - 1, SalesLine.Quantity);
             until Item.Next() = 0;
 
-        CurrPage.SalesChart.Update(BusinessChartBuffer);
+        CurrPage.SalesChart.Update(BusChartBuf);
     end;
 }

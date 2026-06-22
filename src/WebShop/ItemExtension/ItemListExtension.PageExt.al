@@ -5,10 +5,9 @@ pageextension 50101 "Item List WebShop Ext" extends "Item List"
         addafter("Unit Price")
         {
             field("Sales Channel"; Rec."Sales Channel")
-            {
-                ApplicationArea = All;
-                Caption = 'Sales Channel';
-            }
+            { ApplicationArea = All; }
+            field("WooCommerce Product ID"; Rec."WooCommerce Product ID")
+            { ApplicationArea = All; }
         }
     }
 }

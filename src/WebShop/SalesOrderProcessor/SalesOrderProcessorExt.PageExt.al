@@ -1,4 +1,4 @@
-pageextension 50102 "Sales Order Processor Ext" extends "Sales Order Processor"
+pageextension 50102 "SO Processor WebShop Ext" extends "Sales Order Processor"
 {
     layout
     {

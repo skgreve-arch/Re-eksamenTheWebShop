@@ -1,6 +1,5 @@
 codeunit 50102 "Stock Check Job"
 {
-    // Denne codeunit køres af Job Queue
     trigger OnRun()
     begin
         CheckLowStock();
@@ -13,27 +12,22 @@ codeunit 50102 "Stock Check Job"
         Email: Codeunit Email;
         EmailMessage: Codeunit "Email Message";
         LowStockItems: Text;
-        Threshold: Integer;
     begin
-        if not Setup.Get('') then
-            exit;
-
-        Threshold := Setup."Low Stock Threshold";
-        LowStockItems := '';
+        if not Setup.Get('') then exit;
 
         Item.SetRange("Sales Channel", Item."Sales Channel"::"Web Shop");
-        Item.SetFilter(Inventory, '<%1', Threshold);
+        Item.SetFilter(Inventory, '<%1', Setup."Low Stock Threshold");
         if Item.FindSet() then
             repeat
                 LowStockItems += Item."No." + ' - ' + Item.Description +
-                                  ' (Lager: ' + Format(Item.Inventory) + ')\n';
+                                  ' (Lager: ' + Format(Item.Inventory) + ')' + '<br>';
             until Item.Next() = 0;
 
         if LowStockItems <> '' then begin
             EmailMessage.Create(
                 Setup."Notification Email",
                 'ADVARSEL: Lavt lager på webshop-varer',
-                'Følgende varer er under lagergrænsen (' + Format(Threshold) + '):\n\n' + LowStockItems,
+                'Følgende varer er under grænsen:<br><br>' + LowStockItems,
                 true);
             Email.Send(EmailMessage);
         end;
