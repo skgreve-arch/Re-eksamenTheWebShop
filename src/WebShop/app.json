@@ -1,0 +1,12 @@
+{
+  "id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+  "name": "WebShop Integration",
+  "publisher": "DitNavn",
+  "version": "1.0.0.0",
+  "brief": "WooCommerce integration med Business Central",
+  "platform": "25.0.0.0",
+  "application": "25.0.0.0",
+  "idRanges": [{ "from": 50100, "to": 50199 }],
+  "dependencies": [],
+  "runtime": "13.0"
+}
